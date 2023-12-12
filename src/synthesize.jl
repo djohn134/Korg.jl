@@ -198,7 +198,7 @@ function synthesize(atm::ModelAtmosphere, linelist, A_X::AbstractVector{<:Real},
     source_fn = blackbody.((l->l.temp).(atm.layers), all_λs')
     cntm = nothing
     if return_cntm
-        cntm, _ = if bezier_radiative_transfer
+        cntm, cntm_intensity, ~ = if bezier_radiative_transfer
             RadiativeTransfer.BezierTransfer.radiative_transfer(atm, α, source_fn, n_mu_points)
         else
             RadiativeTransfer.MoogStyleTransfer.radiative_transfer(atm, α, source_fn, α5, n_mu_points)
@@ -219,7 +219,7 @@ function synthesize(atm::ModelAtmosphere, linelist, A_X::AbstractVector{<:Real},
     line_absorption!(α, linelist, wl_ranges, [layer.temp for layer in atm.layers], nₑs,
         number_densities, partition_funcs, vmic*1e5, α_cntm, cutoff_threshold=line_cutoff_threshold)
     
-    flux, intensity = if bezier_radiative_transfer
+    flux, intensity, μ = if bezier_radiative_transfer
         RadiativeTransfer.BezierTransfer.radiative_transfer(atm, α, source_fn, n_mu_points)
     else
         RadiativeTransfer.MoogStyleTransfer.radiative_transfer(atm, α, source_fn, α5, n_mu_points)
@@ -234,7 +234,7 @@ function synthesize(atm::ModelAtmosphere, linelist, A_X::AbstractVector{<:Real},
         wl_lb_ind += length(λs)
     end
 
-    (flux=flux, cntm=cntm, intensity=intensity, alpha=α, number_densities=number_densities, 
+    (flux=flux, cntm=cntm, intensity=intensity, cntm_intensity=cntm_intensity, μ=μ, alpha=α, number_densities=number_densities, 
     electron_number_density=nₑs, wavelengths=all_λs.*1e8, subspectra=subspectra)
 end
 
