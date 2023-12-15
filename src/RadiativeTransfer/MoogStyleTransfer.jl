@@ -126,7 +126,7 @@ function spherical_transfer(α, S, τ_ref, α_ref, radii, n_μ_points; μ_mode="
     end
     #calculate 2π∫μIdμ to get astrophysical flux
     F = 2π * (I' * (μ_weights .* μ_surface_grid))
-    F, I
+    F, I, μ_surface_grid
 end
 
 """
