@@ -13,8 +13,8 @@ function generate_mu_grid(n_points; mode="gl")
         μ_grid = @. μ_grid/2 + 0.5
         μ_weights ./= 2
     elseif mode == "user"
-        μ_grid = range(0, 1, npoints)
-        μ_weights = ones(npoints)
+        μ_grid = range(0, 1, n_points)
+        μ_weights = ones(n_points)
     end
     μ_grid, μ_weights
 end
