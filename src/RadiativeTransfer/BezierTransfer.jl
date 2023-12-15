@@ -33,8 +33,8 @@ end
 function radiative_transfer(atm::ShellAtmosphere, α, S, n_μ_points; μ_mode="gl")
     radii = [atm.R + l.z for l in atm.layers]
     photosphere_correction = radii[1]^2 / atm.R^2 
-    F, I = spherical_transfer(α, S, radii, n_μ_points, μ_mode="gl")
-    photosphere_correction .* F, I
+    F, I, μ = spherical_transfer(α, S, radii, n_μ_points, μ_mode="gl")
+    photosphere_correction .* F, I, μ
 end
 
 """
