@@ -30,10 +30,10 @@ function radiative_transfer(atm::PlanarAtmosphere, α, S, n_μ_points)
     zs = [l.z for l in atm.layers]
     planar_transfer(α, S, zs, n_μ_points)
 end
-function radiative_transfer(atm::ShellAtmosphere, α, S, n_μ_points)
+function radiative_transfer(atm::ShellAtmosphere, α, S, n_μ_points; μ_mode="gl")
     radii = [atm.R + l.z for l in atm.layers]
     photosphere_correction = radii[1]^2 / atm.R^2 
-    F, I = spherical_transfer(α, S, radii, n_μ_points)
+    F, I = spherical_transfer(α, S, radii, n_μ_points, μ_mode="gl")
     photosphere_correction .* F, I
 end
 
@@ -81,8 +81,8 @@ radii `radii` [cm]. See [`radiative_transfer`](@ref) for an explantion of the ar
 Returns `(flux, intensity)`, where `flux` is the astrophysical flux, and `intensity`, a matrix of 
 shape (mu values × wavelengths), is the surface intensity as a function of μ.
 """
-function spherical_transfer(α, S, radii, n_μ_points)
-    μ_surface_grid, μ_weights = generate_mu_grid(n_μ_points)
+function spherical_transfer(α, S, radii, n_μ_points; μ_mode="gl")
+    μ_surface_grid, μ_weights = generate_mu_grid(n_μ_points, mode=μ_mode)
 
     #type with which to preallocate arrays (enables autodiff)
     el_type = typeof(promote(radii[1], α[1], S[1], μ_surface_grid[1])[1])

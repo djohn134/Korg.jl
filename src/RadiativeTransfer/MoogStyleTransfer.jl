@@ -29,12 +29,12 @@ function radiative_transfer(atm::PlanarAtmosphere, α, S, α_ref, n_mu_points=no
     τ5 = [l.tau_5000 for l in atm.layers] #τ at 5000 Å according to model atmosphere
     planar_transfer(α, S, τ5, α_ref), nothing
 end
-function radiative_transfer(atm::ShellAtmosphere, α, S, α_ref, n_mu_points)
+function radiative_transfer(atm::ShellAtmosphere, α, S, α_ref, n_mu_points; μ_mode="gl")
     τ5 = [l.tau_5000 for l in atm.layers] #τ at 5000 Å according to model atmosphere
     radii = [atm.R + l.z for l in atm.layers]
     photosphere_correction = radii[1]^2 / atm.R^2
     #discard I, take F only
-    F, I = spherical_transfer(α, S, τ5, α_ref, radii, n_mu_points)
+    F, I = spherical_transfer(α, S, τ5, α_ref, radii, n_mu_points, μ_mode=μ_mode)
     photosphere_correction * F, I
 end
 
@@ -65,8 +65,8 @@ explantion of the arguments. Note that `radii` should be in decreasing order.
 Returns `(flux, intensity)`, where `flux` is the astrophysical flux, and `intensity`, a matrix of 
 shape (mu values × wavelengths), is the surface intensity as a function of μ.
 """
-function spherical_transfer(α, S, τ_ref, α_ref, radii, n_μ_points)
-    μ_surface_grid, μ_weights = generate_mu_grid(n_μ_points)
+function spherical_transfer(α, S, τ_ref, α_ref, radii, n_μ_points; μ_mode="gl")
+    μ_surface_grid, μ_weights = generate_mu_grid(n_μ_points, mode=μ_mode)
 
     R, r0 = radii[1], radii[end] #lower bound of atmosphere
 

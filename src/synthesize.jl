@@ -96,7 +96,7 @@ function synthesize(atm::ModelAtmosphere, linelist, A_X::AbstractVector{<:Real},
                     vmic::Real=1.0, line_buffer::Real=10.0, cntm_step::Real=1.0, 
                     air_wavelengths=false, wavelength_conversion_warn_threshold=1e-4,
                     hydrogen_lines=true, use_MHD_for_hydrogen_lines=true, 
-                    hydrogen_line_window_size=150, n_mu_points=20, line_cutoff_threshold=3e-4, 
+                    hydrogen_line_window_size=150, n_mu_points=20, μ_mode="gl", line_cutoff_threshold=3e-4, 
                     electron_number_density_warn_threshold=1.0, 
                     return_cntm=true,
                     bezier_radiative_transfer=false, ionization_energies=ionization_energies, 
@@ -199,9 +199,9 @@ function synthesize(atm::ModelAtmosphere, linelist, A_X::AbstractVector{<:Real},
     cntm = nothing
     if return_cntm
         cntm, cntm_intensity, ~ = if bezier_radiative_transfer
-            RadiativeTransfer.BezierTransfer.radiative_transfer(atm, α, source_fn, n_mu_points)
+            RadiativeTransfer.BezierTransfer.radiative_transfer(atm, α, source_fn, n_mu_points, μ_mode=μ_mode)
         else
-            RadiativeTransfer.MoogStyleTransfer.radiative_transfer(atm, α, source_fn, α5, n_mu_points)
+            RadiativeTransfer.MoogStyleTransfer.radiative_transfer(atm, α, source_fn, α5, n_mu_points, μ_mode=μ_mode)
         end
     end
 
@@ -220,9 +220,9 @@ function synthesize(atm::ModelAtmosphere, linelist, A_X::AbstractVector{<:Real},
         number_densities, partition_funcs, vmic*1e5, α_cntm, cutoff_threshold=line_cutoff_threshold)
     
     flux, intensity, μ = if bezier_radiative_transfer
-        RadiativeTransfer.BezierTransfer.radiative_transfer(atm, α, source_fn, n_mu_points)
+        RadiativeTransfer.BezierTransfer.radiative_transfer(atm, α, source_fn, n_mu_points, μ_mode=μ_mode)
     else
-        RadiativeTransfer.MoogStyleTransfer.radiative_transfer(atm, α, source_fn, α5, n_mu_points)
+        RadiativeTransfer.MoogStyleTransfer.radiative_transfer(atm, α, source_fn, α5, n_mu_points, μ_mode=μ_mode)
     end
 
     # collect the indices corresponding to each wavelength range
